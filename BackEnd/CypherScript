@@ -1,0 +1,93 @@
+CREATE INDEX ON :Airport(id);
+CREATE INDEX ON :Airline(id);
+CREATE INDEX ON :Route(id);
+CREATE INDEX ON :Airport(country);
+CREATE INDEX ON :Airport(city);
+CREATE INDEX ON :Airport(IATA);
+CREATE INDEX ON :Route(name);
+
+// Step 1: Create Airline nodes
+LOAD CSV WITH HEADERS FROM 'file:///Airlines.csv' AS row
+WITH row
+WHERE row.AirlineID IS NOT NULL AND row.AirlineID <> ''
+MERGE (a:Airline {AirlineID: row.AirlineID})
+SET a.Name = row.Name, 
+    a.Alias = row.Alias, 
+    a.IATA = row.IATA, 
+    a.ICAO = row.ICAO, 
+    a.Callsign = row.Callsign, 
+    a.Country = row.Country, 
+    a.Active = row.Active;
+
+// Step 2: Create Airport nodes
+LOAD CSV WITH HEADERS FROM 'file:///Airports.csv' AS row
+WITH row
+WHERE row.AirportID IS NOT NULL AND row.AirportID <> ''
+MERGE (ap:Airport {AirportID: row.AirportID})
+SET ap.Name = row.Name, 
+    ap.City = row.City, 
+    ap.IATA = row.IATA, 
+    ap.ICAO = row.ICAO, 
+    ap.Latitude = row.Latitude, 
+    ap.Longitude = row.Longitude, 
+    ap.Altitude = row.Altitude, 
+    ap.Timezone = row.Timezone, 
+    ap.DST = row.DST, 
+    ap.TZ = row.TZ, 
+    ap.TYPE = row.TYPE, 
+    ap.Source = row.source;
+
+// Step 3: Establish relationships between Airports and Airlines
+LOAD CSV WITH HEADERS FROM 'file:///Routes.csv' AS row
+WITH row
+WHERE row.AirlineID IS NOT NULL AND row.SourceAirportID IS NOT NULL AND row.DestAirportID IS NOT NULL
+MATCH (airport:Airport {AirportID: row.SourceAirportID})
+MATCH (airline:Airline {AirlineID: row.AirlineID})
+MERGE (airport)-[:SERVES]->(airline);
+
+// Step 4: Create Route nodes and relationships
+LOAD CSV WITH HEADERS FROM 'file:///Routes.csv' AS row
+WITH row
+WHERE row.SourceAirportID IS NOT NULL AND row.DestAirportID IS NOT NULL AND row.AirlineID IS NOT NULL
+MERGE (r:Route {SourceAirportID: row.SourceAirportID, DestAirportID: row.DestAirportID})
+SET r.AirlineID = row.AirlineID, 
+    r.Codeshare = row.Codeshare, 
+    r.Stops = toInteger(row.Stops), 
+    r.Equipment = row.Equipment;
+
+// Step 5: Create City and Country nodes
+LOAD CSV WITH HEADERS FROM 'file:///Airports.csv' AS row
+WITH row
+WHERE row.City IS NOT NULL AND row.City <> '' AND row.Country IS NOT NULL AND row.Country <> ''
+MERGE (c:City {name: row.City})
+MERGE (country:Country {name: row.Country})
+MERGE (c)-[:LOCATED_IN]->(country);
+
+// Step 6: Link Airports to Cities
+LOAD CSV WITH HEADERS FROM 'file:///Airports.csv' AS row
+WITH row
+WHERE row.City IS NOT NULL AND row.City <> '' AND row.AirportID IS NOT NULL AND row.AirportID <> ''
+MATCH (ap:Airport {AirportID: row.AirportID}), (c:City {name: row.City})
+MERGE (ap)-[:LOCATED_IN]->(c);
+
+// Step 7: Create OPERATES relationships for Airlines
+LOAD CSV WITH HEADERS FROM 'file:///Routes.csv' AS row
+WITH row
+WHERE row.AirlineID IS NOT NULL AND row.SourceAirportID IS NOT NULL AND row.DestAirportID IS NOT NULL
+MATCH (airline:Airline {AirlineID: row.AirlineID}), (source:Airport {AirportID: row.SourceAirportID}), (dest:Airport {AirportID: row.DestAirportID})
+MERGE (airline)-[:OPERATES]->(source)
+MERGE (airline)-[:OPERATES]->(dest);
+
+// Step 8: Create CONNECTED_TO relationships between Airports
+LOAD CSV WITH HEADERS FROM 'file:///Routes.csv' AS row
+WITH row
+WHERE row.SourceAirportID IS NOT NULL AND row.DestAirportID IS NOT NULL
+MATCH (source:Airport {AirportID: row.SourceAirportID})
+MATCH (destination:Airport {AirportID: row.DestAirportID})
+MERGE (source)-[:CONNECTED_TO {stops: toInteger(row.Stops), equipment: row.Equipment}]->(destination);
+
+//needed
+MATCH (n)
+WHERE n.Name IS NOT NULL  
+SET n.name = n.Name  
+REMOVE n.Name          

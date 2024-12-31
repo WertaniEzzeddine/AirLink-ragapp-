@@ -1,0 +1,106 @@
+/* src/app/chatbot/chatbot.component.css */
+
+/* Reset default margins and paddings for a clean layout */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Fullscreen chat container */
+  .chat-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100vh; /* Fullscreen height */
+    width: 100%; /* Fullscreen width */
+    background-color: #f0f2f5; /* Subtle background color */
+    overflow: hidden; /* Prevent content overflow */
+    box-sizing: border-box; /* Include padding and borders in size */
+  }
+  
+  /* Messages area */
+  .messages {
+    flex: 1; /* Expands to fill available space */
+    padding: 20px;
+    overflow-y: auto; /* Allow scrolling for long chats */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  /* Style for individual messages */
+  .messages div {
+    max-width: 70%;
+    padding: 12px 18px;
+    border-radius: 15px;
+    word-wrap: break-word;
+    font-size: 15px;
+    line-height: 1.4;
+    transition: background-color 0.3s ease;
+  }
+  
+  .messages .user {
+    align-self: flex-end;
+    background-color: #0084ff;
+    color: white;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .messages .bot {
+    align-self: flex-start;
+    background-color: #e4e6eb;
+    color: #333;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Input area at the bottom */
+  .input-area {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #fff;
+    border-top: 1px solid #ccc;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Input field styling */
+  .input-area input {
+    flex: 1; /* Full width minus button */
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    outline: none;
+    font-size: 15px;
+    margin-right: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s ease;
+  }
+  
+  .input-area input:focus {
+    border-color: #0084ff;
+  }
+  
+  /* Send button styling */
+  .input-area button {
+    padding: 12px 20px;
+    background-color: #0084ff;
+    border: none;
+    border-radius: 20px;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .input-area button:hover {
+    background-color: #005bb5;
+    transform: translateY(-1px);
+  }
+  
+  .input-area button:active {
+    transform: translateY(0);
+  }
+  

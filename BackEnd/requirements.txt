@@ -1,0 +1,15 @@
+nce-transformers
+torch 
+langchain-core
+langchain-community
+langchain-groq
+langgraph
+python-dotenv
+torch
+sentence-transformers
+fastapi
+scikit-learn
+transformers
+neo4j
+pandas
+uvicorn
