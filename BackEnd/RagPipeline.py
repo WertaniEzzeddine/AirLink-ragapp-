@@ -19,7 +19,7 @@ routes_df = pd.read_csv('routes.csv')
 
 # Initialize SentenceTransformer model
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model =     ('all-MiniLM-L6-v2', device=device)
+model =SentenceTransformer('all-MiniLM-L6-v2', device=device)
 
 # JSON file for saving embeddings
 EMBEDDINGS_FILE = "embeddings.json"
